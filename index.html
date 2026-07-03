@@ -314,12 +314,7 @@
 
     var ctrl = new AbortController();
     var timer = setTimeout(function () { ctrl.abort(); }, 25000);
-    fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ token: token, name: fullName, response: answer }),
-      signal: ctrl.signal
-    })
+    fetch(SCRIPT_URL + '?token=' + encodeURIComponent(token) + '&response=' + answer, { signal: ctrl.signal })
     .then(function (r) { return r.json(); })
     .then(function (data) { clearTimeout(timer); data && data.ok ? done() : fail(); })
     .catch(function () { clearTimeout(timer); fail(); });
