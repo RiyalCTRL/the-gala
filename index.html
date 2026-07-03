@@ -312,14 +312,17 @@
 
     if (DEMO) { setTimeout(done, 600); return; }
 
+    var ctrl = new AbortController();
+    var timer = setTimeout(function () { ctrl.abort(); }, 25000);
     fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ token: token, name: fullName, response: answer })
+      body: JSON.stringify({ token: token, name: fullName, response: answer }),
+      signal: ctrl.signal
     })
     .then(function (r) { return r.json(); })
-    .then(function (data) { data && data.ok ? done() : fail(); })
-    .catch(fail);
+    .then(function (data) { clearTimeout(timer); data && data.ok ? done() : fail(); })
+    .catch(function () { clearTimeout(timer); fail(); });
   }
 
   document.getElementById('btnYes').addEventListener('click', function () { respond('yes'); });
